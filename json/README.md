@@ -11,7 +11,7 @@ root
 
 ### Please replace the "lpName" of the Json object with the specific name.
 
-Acceptable lpName:
+Adaptive lpName:
 
 * b2brokerdata.cfg
 * cmcdata.cfg
