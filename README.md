@@ -15,7 +15,8 @@ If you are using our FIX API trading platform individual version(no matter wheth
 root
 │───fixprox-6.0.jar
 └───json
-    └───symbols.json
+│   └───symbols.json
+└───util.cfg
 ```
 
 ### Please don't change the names and the folder structure of the files.
@@ -40,3 +41,7 @@ Adaptive lpName:
 ... More than 20
 
 Please note, every LP(liquidity provider) has different spreads, financing interests and commissions. You need to set the parameters according to the actual conditions.
+
+### util.cfg is the configuration file.
+
+We will post some guide to teach you how to set up the configuration file soon.
