@@ -3,18 +3,11 @@ We created a new version(FIX Bridge) for individual traders. It's for free FOREV
 
 Download link: https://www.fintechee.com/assets/fix-api/fintecheefixbridge.7z
 
-# FIX-API-Pro
-FIX API related news, technology discussion, sample source codes
-
-# Free Campaign for Github User ONLY!!
-
-https://www.fintechee.com/marketing/campaign/
-
-# How to use our FIX API trading platform individual version
+# How to use our FIX API trading platform individual/bridge version
 Please check this page:
-https://www.fintechee.com/features/fix-api/
+https://www.fintechee.com/features/fix-api-bridge/
 
-If you are using our FIX API trading platform individual version(no matter whether it's a paid version or free version), you need to put the "json" folder in the root directory of the FIX API trading platform.
+If you are using our FIX API trading platform individual/bridge version(no matter whether it's a paid version or free version), you need to put the "json" folder in the root directory of the FIX API trading platform.
 
 ```
 root
