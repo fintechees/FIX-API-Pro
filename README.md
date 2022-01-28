@@ -1,3 +1,8 @@
+# New FIX Bridge Version for Individual Traders
+We created a new version(FIX Bridge) for individual traders. It's for free FOREVER!!
+
+Download link: https://www.fintechee.com/assets/fix-api/fintecheefixbridge.7z
+
 # FIX-API-Pro
 FIX API related news, technology discussion, sample source codes
 
