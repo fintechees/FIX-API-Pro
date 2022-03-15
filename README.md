@@ -14,6 +14,18 @@ root
 │───fixprox-6.0.jar
 └───json
 │   └───symbols.json
+└───webcontent
+│   └───js
+│       |───cc
+│       |   └───lang
+│       |       |───en.js
+│       |       └───cn.js
+│       └───brokers.js
+│       └───builtin.js
+│       └───cpp.js
+│       └───d.js
+│       └───o.js
+│       └───u.js
 └───util.cfg
 ```
 
