@@ -12,19 +12,19 @@ If you are using our FIX API trading platform individual/bridge version(no matte
 ```
 root
 │───fixprox-6.0.jar
-└───json
+|───json
 │   └───symbols.json
-└───webcontent
+|───webcontent
 │   └───js
 │       |───cc
 │       |   └───lang
 │       |       |───en.js
 │       |       └───cn.js
-│       └───brokers.js
-│       └───builtin.js
-│       └───cpp.js
-│       └───d.js
-│       └───o.js
+│       |───brokers.js
+│       |───builtin.js
+│       |───cpp.js
+│       |───d.js
+│       |───o.js
 │       └───u.js
 └───util.cfg
 ```
