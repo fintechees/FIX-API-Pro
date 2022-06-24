@@ -35,8 +35,10 @@ var eaStudio = {
 
 			var lines = sourceCode.split("\n")
 			var op = []
+      var cursor = -1
 
 			for (var i in lines) {
+        cursor = parseInt(i)
 				var line = lines[i]
 
         if (line.trim() == "") {
@@ -230,8 +232,16 @@ var eaStudio = {
 						}
 					}
 				}
-
 			}
+
+      var sourceBody = []
+      var linesLength = lines.length
+
+      if (cursor >= 0) {
+        for (var i = cursor; i < linesLength; i++) {
+          sourceBody.push(lines[i])
+        }
+      }
 
       var removedLines = ""
 
@@ -306,7 +316,8 @@ var eaStudio = {
       params: params,
       globalVars: globalVars,
       datainput: "Time, 0\nVolume, 1\nOpen, 2\nHigh, 3\nLow, 4\nClose, 5",
-      dataoutput: dataoutput
+      dataoutput: dataoutput,
+      sourceBody: sourceBody.join("\n")
     }
   },
   isNumeric: function (number) {
@@ -335,12 +346,8 @@ var eaStudio = {
   	    type: pm1,
   	    required: pm[2] == 'true' ? true : false,
   	    value: this.isInteger(pm3) ? parseInt(pm3) : (this.isNumeric(pm3) ? parseFloat(pm3) : (pm3 == 'true' ? true : (pm3 == 'false' ? false : (pm3 == 'null' ? null : (pm1 == 'String' ? pm3.slice(1,-1) : pm3))))),
-  	    range: pm1 != 'String' ? [] : null
+  	    range: null
   	  }
-      if (pm1 != 'String') {
-	      obj.range.push(this.isInteger(pm4) ? parseInt(pm4) : (this.isNumeric(pm4) ? parseFloat(pm4) : (pm4 == 'true' ? true : (pm4 == 'false' ? false : (pm4 == 'null' ? null : pm4)))))
-	      obj.range.push(this.isInteger(pm5) ? parseInt(pm5) : (this.isNumeric(pm5) ? parseFloat(pm5) : (pm5 == 'true' ? true : (pm5 == 'false' ? false : (pm5 == 'null' ? null : pm5)))))
-      }
   	  parsedParams.push(obj)
   	}
 
@@ -376,6 +383,149 @@ var eaStudio = {
 
   	return parsedOutput
   },
+  generateOnInitSourceCodes: function (sourceCodes) {
+    var onInitMatch = sourceCodes.match(/OnInit/g)
+    var onInitSourceCodes =
+    'EMSCRIPTEN_KEEPALIVE\n' +
+    'void onInit (int uid) {\n' +
+    ((onInitMatch != null && onInitMatch.length > 0) ? '  OnInit();\n' : '') +
+    '}\n'
+    return onInitSourceCodes
+  },
+  generateOnDeinitSourceCodes: function (sourceCodes) {
+    var onDeinitMatch = sourceCodes.match(/OnDeinit/g)
+    var onDeinitSourceCodes =
+    'EMSCRIPTEN_KEEPALIVE\n' +
+    'void onDeinit (int uid, const int reason) {\n' +
+    ((onDeinitMatch != null && onDeinitMatch.length > 0) ? '  OnDeinit(reason);\n' : '') +
+    '}\n'
+    return onDeinitSourceCodes
+  },
+  convertTOHLCV: function (sourceCodes) {
+    var newSourceCodes = sourceCodes
+    var regexps = []
+
+    regexps.push(/Time\s*\[[\w\s\.]*\]/g)
+    regexps.push(/Open\s*\[[\w\s\.]*\]/g)
+    regexps.push(/High\s*\[[\w\s\.]*\]/g)
+    regexps.push(/Low\s*\[[\w\s\.]*\]/g)
+    regexps.push(/Close\s*\[[\w\s\.]*\]/g)
+    regexps.push(/Volume\s*\[[\w\s\.]*\]/g)
+
+    for (var i in regexps) {
+      var tohlcvMatches = newSourceCodes.match(regexps[i])
+      for (var j in tohlcvMatches) {
+        var tohlcvMatch = tohlcvMatches[j]
+        var matchArr = []
+        var matchArr2 = tohlcvMatch.split("[")
+        matchArr.push(matchArr2[0])
+        matchArr2 = matchArr2[1].split("]")
+        matchArr.push(matchArr2[0])
+        var tohlcv = "i" + matchArr[0] + "(NULL, 0, " + matchArr[1] + ")"
+        newSourceCodes = newSourceCodes.replaceAll(tohlcvMatch, tohlcv)
+      }
+    }
+
+    return newSourceCodes
+  },
+  convertPeriod: function (sourceCodes) {
+    return sourceCodes.replaceAll("_Period", "Period")
+  },
+  convertPoint: function (sourceCodes) {
+    return sourceCodes.replaceAll("_Point", "Point")
+  },
+  generateApiCallingSourceCodes: function (sourceCodes) {
+    var apiCallingMatchSet = new Set()
+    var regexps1 = []
+    var regexps2 = []
+    var regexps3 = []
+
+    regexps1.push(/iTime\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps1.push(/iOpen\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps1.push(/iHigh\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps1.push(/iLow\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps1.push(/iClose\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps1.push(/iVolume\s*\([\w\s,\.\+\*\-]*\)/g)
+
+    for (var i in regexps1) {
+      var apiCallingMatches = sourceCodes.match(regexps1[i])
+      for (var j in apiCallingMatches) {
+        var apiCallingMatch = apiCallingMatches[j]
+        var matchArr = apiCallingMatch.split(",")
+        matchArr.splice(2, 1)
+        for (var k in matchArr) {
+          matchArr[k] = matchArr[k].trim()
+        }
+        matchArr[0] = matchArr[0].replace(/iTime|iOpen|iHigh|iLow|iClose|iVolume/, "    iTime")
+        matchArr.push("0);\n")
+        var apiCallingMatch2 = matchArr.join(", ")
+        apiCallingMatchSet.add(apiCallingMatch2)
+      }
+    }
+
+    regexps2.push(/iHighest\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps2.push(/iLowest\s*\([\w\s,\.\+\*\-]*\)/g)
+
+    for (var i in regexps2) {
+      var apiCallingMatches = sourceCodes.match(regexps2[i])
+      for (var j in apiCallingMatches) {
+        var apiCallingMatch = apiCallingMatches[j]
+        var matchArr = apiCallingMatch.split(",")
+        matchArr.splice(2, 3)
+        for (var k in matchArr) {
+          matchArr[k] = matchArr[k].trim()
+        }
+        matchArr[0] = matchArr[0].replace(/iHighest|iLowest/, "    iTime")
+        matchArr.push("0);\n")
+        var apiCallingMatch2 = matchArr.join(", ")
+        apiCallingMatchSet.add(apiCallingMatch2)
+      }
+    }
+
+    regexps3.push(/iAC\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iADX\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iAlligator\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iAO\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iATR\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iBearsPower\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iBands\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iBullsPower\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iCCI\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iCustom\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iDeMarker\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iEnvelopes\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iFractals\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iIchimoku\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iMA\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iMACD\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iMFI\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iMomentum\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iRSI\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iRVI\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iSAR\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iStochastic\s*\([\w\s,\.\+\*\-]*\)/g)
+    regexps3.push(/iWPR\s*\([\w\s,\.\+\*\-]*\)/g)
+
+    for (var i in regexps3) {
+      var apiCallingMatches = sourceCodes.match(regexps3[i])
+
+      for (var j in apiCallingMatches) {
+        var apiCallingMatch = apiCallingMatches[j]
+        var matchArr = apiCallingMatch.split(",")
+        matchArr.splice(matchArr.length - 1, 1)
+        for (var k in matchArr) {
+          matchArr[k] = matchArr[k].trim()
+        }
+        matchArr[0] = "    " + matchArr[0]
+        matchArr.push("0);\n")
+        var apiCallingMatch2 = matchArr.join(", ")
+        apiCallingMatchSet.add(apiCallingMatch2)
+      }
+    }
+
+    var apiCallingMatchArr = Array.from(apiCallingMatchSet)
+    return apiCallingMatchArr.join("")
+  },
   generateIndi: function (serverUrl, name, sourceCode) {
     var that = this
     return new Promise(function(resolve, reject) {
@@ -386,8 +536,9 @@ var eaStudio = {
       }
     })
   },
-  generateIndi2: function (serverUrl, name, sourceCode) {
+  generateIndi2: function (serverUrl, name, srcCodes) {
     var fileName = name.trim() == "" ? "test" : name.trim()
+    var sourceCode = this.convertPoint(this.convertPeriod(this.convertTOHLCV(srcCodes)))
     var generatedStructure = this.generateStructure(sourceCode)
 
   	var namedesc = [fileName, "This is an example.", (serverUrl.trim() == "" ? "http://127.0.0.1:3000" : serverUrl.trim()) + "/js/" + fileName + ".js"]
@@ -494,8 +645,8 @@ var eaStudio = {
 
   	var template15 = ')\n'
 
-  	var sourcecode = template + template1 + template2 + template3 + template4 + template5 + template6 + template7 + template8 + template9 + template10 +
-  	                 template11 + template12 + template13 + template14 + template15
+  	var newSourcecode = template + template1 + template2 + template3 + template4 + template5 + template6 + template7 + template8 + template9 + template10 +
+  	                 template11 + template12 + template13 + template14 + template15 + generatedStructure.sourceBody
 
   	var definition = {
   		name: namedesc[0],
@@ -508,7 +659,7 @@ var eaStudio = {
   	}
 
     return {
-      sourcecode: sourcecode,
+      sourcecode: newSourcecode,
       definition: definition
     }
   },
@@ -522,8 +673,9 @@ var eaStudio = {
       }
     })
   },
-  generateEa2: function (serverUrl, name, sourceCode) {
+  generateEa2: function (serverUrl, name, srcCodes) {
     var fileName = name.trim() == "" ? "test" : name.trim()
+    var sourceCode = this.convertPoint(this.convertPeriod(this.convertTOHLCV(srcCodes)))
     var generatedStructure = this.generateStructure(sourceCode)
 
   	var namedesc = [fileName, "This is an example.", (serverUrl.trim() == "" ? "http://127.0.0.1:3000" : serverUrl.trim()) + "/js/" + fileName + ".js"]
@@ -553,7 +705,9 @@ var eaStudio = {
 
   	var template3 = '\n' +
   	'extern "C" {\n\n' +
-  	'EMSCRIPTEN_KEEPALIVE\n' +
+    this.generateOnInitSourceCodes(sourceCode) +
+    this.generateOnDeinitSourceCodes(sourceCode) +
+    'EMSCRIPTEN_KEEPALIVE\n' +
   	'void onTick (int uid, int barNum, double ask, double bid, double point, int digits) {\n' +
   	'  iFintecheeUID = uid;\n' +
   	'  Bars = barNum;\n' +
@@ -578,7 +732,7 @@ var eaStudio = {
   	}
 
   	var template5 = '    }\n' +
-      '    OnTick();\n' +
+    this.generateApiCallingSourceCodes(sourceCode) +
   	'    paramHandleList[uid].bInit = false;\n' +
   	'  } else {\n' +
       '    OnTick();\n' +
@@ -586,7 +740,7 @@ var eaStudio = {
   	'}\n\n' +
   	'}\n'
 
-  	var sourcecode = template + template1 + template2 + template3 + template4 + template5
+  	var newSourcecode = template + template1 + template2 + template3 + template4 + template5 + generatedStructure.sourceBody
 
   	var definition = {
   		name: namedesc[0],
@@ -596,7 +750,7 @@ var eaStudio = {
   	}
 
     return {
-      sourcecode: sourcecode,
+      sourcecode: newSourcecode,
       definition: definition
     }
   },
