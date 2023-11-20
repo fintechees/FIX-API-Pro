@@ -30,7 +30,8 @@
 "limitStopMin": 0,
 "lpLotsUnit": 1.0,
 "spread": 1.0,
-"symbolType": 0
+"symbolType": 0,
+"lotsUnit": 100000.0
 },{
 "toFixed": 1000,
 "ask1": 0,
@@ -63,7 +64,8 @@
 "limitStopMin": 0,
 "lpLotsUnit": 1.0,
 "spread": 1.0,
-"symbolType": 0
+"symbolType": 0,
+"lotsUnit": 100000.0
 },{
 "toFixed": 100000,
 "ask1": 0,
@@ -96,7 +98,8 @@
 "limitStopMin": 0,
 "lpLotsUnit": 1.0,
 "spread": 1.0,
-"symbolType": 0
+"symbolType": 0,
+"lotsUnit": 100000.0
 },{
 "toFixed": 100000,
 "ask1": 0,
@@ -129,7 +132,8 @@
 "limitStopMin": 0,
 "lpLotsUnit": 1.0,
 "spread": 1.0,
-"symbolType": 0
+"symbolType": 0,
+"lotsUnit": 100000.0
 },{
 "toFixed": 100000,
 "ask1": 0,
@@ -162,7 +166,8 @@
 "limitStopMin": 0,
 "lpLotsUnit": 1.0,
 "spread": 1.0,
-"symbolType": 0
+"symbolType": 0,
+"lotsUnit": 100000.0
 },{
 "toFixed": 100000,
 "ask1": 0,
@@ -194,7 +199,8 @@
 "lpSymbolName": "USD/CAD",
 "limitStopMin": 0,
 "lpLotsUnit": 1.0,
-"symbolType": 0
+"symbolType": 0,
+"lotsUnit": 100000.0
 },{
 "toFixed": 1000,
 "ask1": 0,
@@ -227,7 +233,8 @@
 "limitStopMin": 0,
 "lpLotsUnit": 1.0,
 "spread": 1.0,
-"symbolType": 0
+"symbolType": 0,
+"lotsUnit": 100000.0
 },{
 "toFixed": 100000,
 "ask1": 0,
@@ -260,7 +267,8 @@
 "limitStopMin": 0,
 "lpLotsUnit": 1.0,
 "spread": 1.0,
-"symbolType": 0
+"symbolType": 0,
+"lotsUnit": 100000.0
 },{
 "toFixed": 100000,
 "ask1": 0,
@@ -293,7 +301,8 @@
 "limitStopMin": 0,
 "lpLotsUnit": 1.0,
 "spread": 1.0,
-"symbolType": 0
+"symbolType": 0,
+"lotsUnit": 100000.0
 },{
 "toFixed": 1000,
 "ask1": 0,
@@ -326,7 +335,8 @@
 "limitStopMin": 0,
 "lpLotsUnit": 1.0,
 "spread": 1.0,
-"symbolType": 0
+"symbolType": 0,
+"lotsUnit": 100000.0
 },{
 "toFixed": 100000,
 "ask1": 0,
@@ -359,7 +369,8 @@
 "limitStopMin": 0,
 "lpLotsUnit": 1.0,
 "spread": 1.0,
-"symbolType": 0
+"symbolType": 0,
+"lotsUnit": 100000.0
 },{
 "toFixed": 1000,
 "ask1": 0,
@@ -392,7 +403,8 @@
 "limitStopMin": 0,
 "lpLotsUnit": 1.0,
 "spread": 1.0,
-"symbolType": 0
+"symbolType": 0,
+"lotsUnit": 100000.0
 },{
 "toFixed": 100000,
 "ask1": 0,
@@ -425,7 +437,8 @@
 "limitStopMin": 0,
 "lpLotsUnit": 1.0,
 "spread": 1.0,
-"symbolType": 0
+"symbolType": 0,
+"lotsUnit": 100000.0
 },{
 "toFixed": 100000,
 "ask1": 0,
@@ -458,5 +471,6 @@
 "limitStopMin": 0,
 "lpLotsUnit": 1.0,
 "spread": 1.0,
-"symbolType": 0
+"symbolType": 0,
+"lotsUnit": 100000.0
 }]}
